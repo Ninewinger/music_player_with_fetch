@@ -11,10 +11,13 @@ const Lista = () => {
 
     let reproductor = useRef();
 
+    const [ultimaPosicion, setUltimaPosicion] = useState(null)
+
     const listItems = listaMusica.map(function (cancion, i) {
         const url = cancion.url
-        return <li key={i}><button onClick={() => {reproductor.src = "https://assets.breatheco.de/apis/sound/" + url}}>{cancion.name}</button></li>
+        return <li key={i}><button onClick={() => {reproductor.src = "https://assets.breatheco.de/apis/sound/" + url; setUltimaPosicion(i)}}>{cancion.name}</button></li>
     })
+    
 
     useEffect(() => {
         console.log(reproductor)
@@ -33,9 +36,31 @@ const Lista = () => {
     }
 
     function siguienteCancion() {
-        if (reproductor) {
-
+        
+        if (ultimaPosicion === null || ultimaPosicion === listaMusica.length -1) {
+            reproductor.src = "https://assets.breatheco.de/apis/sound/" + listaMusica[0].url;
+            setUltimaPosicion(0)
+            playAudio()
+            return;
         }
+        reproductor.src = "https://assets.breatheco.de/apis/sound/" + listaMusica[ultimaPosicion + 1].url;
+        playAudio()
+        setUltimaPosicion(ultimaPosicion + 1);
+            
+    }
+
+    function cancionAnterior() {
+        
+        if (ultimaPosicion === null || ultimaPosicion === listaMusica.length -1) {
+            reproductor.src = "https://assets.breatheco.de/apis/sound/" + listaMusica[listaMusica.length-1].url;
+            setUltimaPosicion(0)
+            playAudio()
+            return;
+        }
+        reproductor.src = "https://assets.breatheco.de/apis/sound/" + listaMusica[ultimaPosicion + 1].url;
+        playAudio()
+        setUltimaPosicion(ultimaPosicion + 1);
+            
     }
 
     return (
@@ -47,13 +72,13 @@ const Lista = () => {
             <div id="barra">
                 <audio ref={t => reproductor = t}></audio>
                 <div id="contBotones">
-                    <button id="anterior" className="botones" /* onClick={ } */>
+                    <button id="anterior" className="botones" onClick={cancionAnterior}>
                         <FontAwesomeIcon icon={faBackward} />
                     </button>
                     <button id="play" className="botones" onClick={playAudio}>
                         {icon}
                     </button>
-                    <button id="siguiente" className="botones" /* onClick={ } */>
+                    <button id="siguiente" className="botones" onClick={siguienteCancion}>
                         <FontAwesomeIcon icon={faForward} />
                     </button>
                 </div>
