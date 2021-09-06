@@ -25,7 +25,7 @@ const Lista = () => {
 
     const listItems = listaMusica.map(function (cancion, i) {
         const url = cancion.url
-        return <li key={i}><button className="btnMusic" onClick={() => { reproductor.src = "https://assets.breatheco.de/apis/sound/" + url; setUltimaPosicion(i) }}>{cancion.name}</button></li>
+        return <li key={i}><button className="btnMusic" onClick={() => { reproductor.src = "https://assets.breatheco.de/apis/sound/" + url; setUltimaPosicion(i); playAudio() }}>{cancion.name}</button></li>
     })
 
     function playAudio() {
