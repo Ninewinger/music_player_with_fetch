@@ -3,27 +3,30 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faBackward, faForward, faPause } from '@fortawesome/free-solid-svg-icons';
 
 const Lista = () => {
-    const [listaMusica, setLista] = useState([
-        { "id": 1, "category": "game", "name": "Mario Castle", "url": "files/mario/songs/castle.mp3" },
-        { "id": 2, "category": "game", "name": "Mario Star", "url": "files/mario/songs/hurry-starman.mp3" },
-        { "id": 3, "category": "game", "name": "Mario Overworld", "url": "files/mario/songs/overworld.mp3" }
-    ])
+
+    const [listaMusica, setListaMusica] = useState([])
+    const [ultimaPosicion, setUltimaPosicion] = useState(null)
+    const [icon, cambiarIcon] = useState(<FontAwesomeIcon icon={faPlay} />)
 
     let reproductor = useRef();
 
-    const [ultimaPosicion, setUltimaPosicion] = useState(null)
+    useEffect(() => {
+        getMusic();
+    }, [])
+
+    const getMusic = () => {
+        fetch("https://assets.breatheco.de/apis/sound/songs")
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data)
+                setListaMusica(data);
+            });
+    }
 
     const listItems = listaMusica.map(function (cancion, i) {
         const url = cancion.url
-        return <li key={i}><button onClick={() => {reproductor.src = "https://assets.breatheco.de/apis/sound/" + url; setUltimaPosicion(i)}}>{cancion.name}</button></li>
+        return <li key={i}><button className="btnMusic" onClick={() => { reproductor.src = "https://assets.breatheco.de/apis/sound/" + url; setUltimaPosicion(i) }}>{cancion.name}</button></li>
     })
-    
-
-    useEffect(() => {
-        console.log(reproductor)
-    })
-
-    const [icon, cambiarIcon] = useState(<FontAwesomeIcon icon={faPlay} />)
 
     function playAudio() {
         if (reproductor.paused) {
@@ -36,8 +39,8 @@ const Lista = () => {
     }
 
     function siguienteCancion() {
-        
-        if (ultimaPosicion === null || ultimaPosicion === listaMusica.length -1) {
+
+        if (ultimaPosicion === null || ultimaPosicion === listaMusica.length - 1) {
             reproductor.src = "https://assets.breatheco.de/apis/sound/" + listaMusica[0].url;
             setUltimaPosicion(0)
             playAudio()
@@ -46,29 +49,30 @@ const Lista = () => {
         reproductor.src = "https://assets.breatheco.de/apis/sound/" + listaMusica[ultimaPosicion + 1].url;
         playAudio()
         setUltimaPosicion(ultimaPosicion + 1);
-            
+
     }
 
     function cancionAnterior() {
-        
-        if (ultimaPosicion === null || ultimaPosicion === listaMusica.length -1) {
-            reproductor.src = "https://assets.breatheco.de/apis/sound/" + listaMusica[listaMusica.length-1].url;
-            setUltimaPosicion(0)
+
+        if (ultimaPosicion === null || ultimaPosicion === 0) {
+            reproductor.src = "https://assets.breatheco.de/apis/sound/" + listaMusica[listaMusica.length - 1].url;
+            setUltimaPosicion(listaMusica.length - 1)
             playAudio()
             return;
         }
-        reproductor.src = "https://assets.breatheco.de/apis/sound/" + listaMusica[ultimaPosicion + 1].url;
+        reproductor.src = "https://assets.breatheco.de/apis/sound/" + listaMusica[ultimaPosicion - 1].url;
         playAudio()
-        setUltimaPosicion(ultimaPosicion + 1);
-            
+        setUltimaPosicion(ultimaPosicion - 1);
+
     }
 
     return (
         <div>
-            
+            <div className="conLista">
             <ul>
                 {listItems}
             </ul>
+            </div>
             <div id="barra">
                 <audio ref={t => reproductor = t}></audio>
                 <div id="contBotones">
